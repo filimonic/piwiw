@@ -1,0 +1,6 @@
+.git
+.github
+.claude
+*.md
+in.json
+out.json

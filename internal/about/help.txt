@@ -1,0 +1,93 @@
+PIWIW - Ollama to OpenAI Chat API Proxy
+
+DESCRIPTION:
+    A tiny dumb microservice to proxy Ollama Chat API to OpenAI chat completion API.
+
+USAGE:
+    piwiw [options]
+
+CONFIGURATION:
+    piwiw is configured using environment variables.
+
+OPTIONS:
+    SERVER_PORT
+        Type:        integer
+        Default:     11434
+        Description: HTTP server port piwiw listens on
+
+    PROXY_PORT
+        Type:        integer
+        Default:     11434
+        Description: Alias to SERVER_PORT. Ignored if SERVER_PORT is set.
+                    For eyalrot/ollama_openai compatibility.
+
+    OPENAI_API_BASE_URL [REQUIRED]
+        Type:        string
+        Description: HTTP(S) base URL of OpenAI API endpoint
+        Example:     https://api.example.com/v1
+
+    SKIP_TLS_VERIFY
+        Type:        boolean
+        Default:     false
+        Description: Skip OpenAI API certificate verification
+
+    OPENAI_API_KEY [REQUIRED]
+        Type:        string
+        Description: OpenAI API endpoint bearer token
+        Example:     sk-12345
+
+    OPENAI_API_CHAT_FORCED_PARAMS
+        Type:        JSON
+        Default:     {}
+        Description: Params that will be added (replaced) to OpenAI Chat
+                     Completion API request
+        Example:     {"model":"my-model"} will force model to be used.
+
+    REQUEST_TIMEOUT
+        Type:        integer (seconds)
+        Default:     180
+        Description: Number of seconds piwiw will wait for response from
+                     OpenAI API for a single request
+
+    MAX_RETRIES
+        Type:        integer
+        Default:     3
+        Description: Number of times piwiw will retry failed requests
+                     (REQUEST_TIMEOUT or 5xx response code)
+
+    RETRY_DELAY
+        Type:        integer (seconds)
+        Default:     300
+        Description: Delay before retrying failed requests
+
+    EMPTY_CONTENT_TEXT
+        Type:        text
+        Default:     ""
+        Description: If OpenAI response contains message with null or empty
+                     content, this text will be passed back to ollama client.
+
+    TRACE_FOLDER_PATH
+        Type:        string
+        Default:     (none, tracing disabled)
+        Description: If set, piwiw traces each request/response pair as JSON
+                     files into a per-request folder under this path.
+
+    TRACE_KEEP_HOURS
+        Type:        integer (hours)
+        Default:     2160
+        Description: Trace folders older than this (by folder name) are
+                     deleted once an hour. Only relevant if
+                     TRACE_FOLDER_PATH is set.
+
+EXAMPLES:
+    Set required variables and start piwiw:
+        $ export OPENAI_API_BASE_URL="https://api.example.com/v1"
+        $ export OPENAI_API_KEY="sk-12345"
+        $ piwiw
+
+    Override port and add forced parameters:
+        $ SERVER_PORT=8080 \
+          OPENAI_API_BASE_URL="https://api.example.com/v1" \
+          OPENAI_API_KEY="sk-12345" \
+          OPENAI_API_CHAT_FORCED_PARAMS='{"model":"gpt-4"}' \
+          piwiw
