@@ -24,12 +24,16 @@ RUN CGO_ENABLED=0 go build \
 
 FROM alpine:latest
 
-# Required for TLS verification when piwiw talks to the OpenAI API over HTTPS.
-RUN apk add --no-cache ca-certificates \
+# ca-certificates provides update-ca-certificates, run at container start (see
+# docker-entrypoint.sh) so certs mounted into /usr/local/share/ca-certificates
+# are picked up. su-exec drops from root back to the piwiw user afterwards.
+RUN apk add --no-cache ca-certificates su-exec \
     && addgroup -S piwiw \
     && adduser -S -G piwiw -H -D piwiw
 
 COPY --from=builder /out/piwiw /usr/local/bin/piwiw
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Defaults, mirroring the values documented in README.md.
 # OPENAI_API_BASE_URL and OPENAI_API_KEY have no default and are required
@@ -46,6 +50,4 @@ ENV SERVER_PORT=11434 \
 
 EXPOSE 11434
 
-USER piwiw
-
-ENTRYPOINT ["/usr/local/bin/piwiw"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
