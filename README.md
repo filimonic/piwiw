@@ -14,6 +14,7 @@ A tiny dumb microservice to proxy Ollama Chat API to OpenAI chat completion API.
 | SKIP_TLS_VERIFY               | bool    | `false`    | Skip OpenAI API certificate verification
 | OPENAI_API_KEY                | string  | _required_ | OpenAI API endpoint bearer token, ex `sk-12345`
 | OPENAI_API_CHAT_FORCED_PARAMS | json    | `{}`       | Params that will be added (replaced) to OpenAI Chat Completion API request, ex `{"model":"my-model"}` will force model to be used.
+| OPENAI_API_CHAT_FORCED_PARAMS_B64 | base64 | _(none)_ | Same as `OPENAI_API_CHAT_FORCED_PARAMS`, but base64-encoded. Useful when the plain JSON value gets mangled by intermediate YAML/templating tools. Mutually exclusive with `OPENAI_API_CHAT_FORCED_PARAMS`.
 | REQUEST_TIMEOUT               | seconds | 180        | Number of seconds `piwiw` will wait for response from OpenAI API for single request
 | MAX_RETRIES                   | integer | 3          | For failed requests by `REQUEST_TIMEOUT` or with `5xx` response code, `piwiw` will retry request `MAX_RETRIES` times. 
 | RETRY_DELAY                   | seconds | 300        | Request retry will be delayed for `RETRY_DELAY`.

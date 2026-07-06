@@ -41,6 +41,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENV SERVER_PORT=11434 \
     SKIP_TLS_VERIFY=false \
     OPENAI_API_CHAT_FORCED_PARAMS="" \
+    OPENAI_API_CHAT_FORCED_PARAMS_B64="" \
     REQUEST_TIMEOUT=180 \
     MAX_RETRIES=3 \
     RETRY_DELAY=300 \

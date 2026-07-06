@@ -1,6 +1,7 @@
 package piwiw
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 
@@ -8,17 +9,18 @@ import (
 )
 
 type Config struct {
-	ProxyPort                 int    `env:"SERVER_PORT,PROXY_PORT" env-default:"11434"`
-	OpenAIAPIBaseUrl          string `env:"OPENAI_API_BASE_URL,required"`
-	SkipTLSVerify             bool   `env:"SKIP_TLS_VERIFY" env-default:"false"`
-	OpenAIAPIToken            string `env:"OPENAI_API_KEY,required"`
-	OpenAIAPIChatForcedParams string `env:"OPENAI_API_CHAT_FORCED_PARAMS"`
-	RequestTimeout            int    `env:"REQUEST_TIMEOUT" env-default:"180"`
-	MaxRetries                int    `env:"MAX_RETRIES" env-default:"3"`
-	RetryDelay                int    `env:"RETRY_DELAY" env-default:"300"`
-	EmptyContentText          string `env:"EMPTY_CONTENT_TEXT" env-default:""`
-	TraceFolderPath           string `env:"TRACE_FOLDER_PATH"`
-	TraceKeepHours            int    `env:"TRACE_KEEP_HOURS" env-default:"2160"`
+	ProxyPort                    int    `env:"SERVER_PORT,PROXY_PORT" env-default:"11434"`
+	OpenAIAPIBaseUrl             string `env:"OPENAI_API_BASE_URL,required"`
+	SkipTLSVerify                bool   `env:"SKIP_TLS_VERIFY" env-default:"false"`
+	OpenAIAPIToken               string `env:"OPENAI_API_KEY,required"`
+	OpenAIAPIChatForcedParams    string `env:"OPENAI_API_CHAT_FORCED_PARAMS"`
+	OpenAIAPIChatForcedParamsB64 string `env:"OPENAI_API_CHAT_FORCED_PARAMS_B64"`
+	RequestTimeout               int    `env:"REQUEST_TIMEOUT" env-default:"180"`
+	MaxRetries                   int    `env:"MAX_RETRIES" env-default:"3"`
+	RetryDelay                   int    `env:"RETRY_DELAY" env-default:"300"`
+	EmptyContentText             string `env:"EMPTY_CONTENT_TEXT" env-default:""`
+	TraceFolderPath              string `env:"TRACE_FOLDER_PATH"`
+	TraceKeepHours               int    `env:"TRACE_KEEP_HOURS" env-default:"2160"`
 }
 
 func (c *Config) GetOpenAIAPIChatForcedParams() json.RawMessage {
@@ -35,6 +37,16 @@ func LoadConfig() (*Config, error) {
 	}
 	if cfg.ProxyPort <= 0 || cfg.ProxyPort >= 65535 {
 		return nil, fmt.Errorf("PORT is not valid")
+	}
+	if cfg.OpenAIAPIChatForcedParamsB64 != "" {
+		if cfg.OpenAIAPIChatForcedParams != "" {
+			return nil, fmt.Errorf("OPENAI_API_CHAT_FORCED_PARAMS and OPENAI_API_CHAT_FORCED_PARAMS_B64 are mutually exclusive")
+		}
+		decoded, err := base64.StdEncoding.DecodeString(cfg.OpenAIAPIChatForcedParamsB64)
+		if err != nil {
+			return nil, fmt.Errorf("OPENAI_API_CHAT_FORCED_PARAMS_B64 is not valid base64: %w", err)
+		}
+		cfg.OpenAIAPIChatForcedParams = string(decoded)
 	}
 	if cfg.OpenAIAPIChatForcedParams != "" && !json.Valid([]byte(cfg.OpenAIAPIChatForcedParams)) {
 		return nil, fmt.Errorf("OPENAI_API_CHAT_FORCED_PARAMS is not valid JSON ('%s')", cfg.OpenAIAPIChatForcedParams)

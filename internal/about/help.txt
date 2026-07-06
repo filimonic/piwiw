@@ -43,6 +43,14 @@ OPTIONS:
                      Completion API request
         Example:     {"model":"my-model"} will force model to be used.
 
+    OPENAI_API_CHAT_FORCED_PARAMS_B64
+        Type:        base64
+        Default:     (none)
+        Description: Same as OPENAI_API_CHAT_FORCED_PARAMS, but
+                     base64-encoded. Useful when the plain JSON value gets
+                     mangled by intermediate YAML/templating tools.
+                     Mutually exclusive with OPENAI_API_CHAT_FORCED_PARAMS.
+
     REQUEST_TIMEOUT
         Type:        integer (seconds)
         Default:     180
