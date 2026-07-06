@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -73,6 +74,8 @@ func handleChatRequest(w http.ResponseWriter, r *http.Request) {
 		Transport: transport,
 	}
 
+	chatCompletionsURL := strings.TrimRight(cfg.OpenAIAPIBaseUrl, "/") + "/chat/completions"
+
 	var respBody []byte
 	var lastErr error
 	var lastStatus int
@@ -96,7 +99,7 @@ func handleChatRequest(w http.ResponseWriter, r *http.Request) {
 		}
 		trace.writeJSON(requestID, "2_openai_request.outgoing.json", reqBody)
 
-		req, err := http.NewRequestWithContext(r.Context(), http.MethodPost, cfg.OpenAIAPIBaseUrl, bytes.NewReader(reqBody))
+		req, err := http.NewRequestWithContext(r.Context(), http.MethodPost, chatCompletionsURL, bytes.NewReader(reqBody))
 		if err != nil {
 			respondError(w, requestID, http.StatusInternalServerError, "Failed to create request")
 			return
