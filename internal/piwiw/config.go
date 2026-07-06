@@ -37,7 +37,7 @@ func LoadConfig() (*Config, error) {
 		return nil, fmt.Errorf("PORT is not valid")
 	}
 	if cfg.OpenAIAPIChatForcedParams != "" && !json.Valid([]byte(cfg.OpenAIAPIChatForcedParams)) {
-		return nil, fmt.Errorf("OPENAI_API_CHAT_FORCED_PARAMS is not valid JSON")
+		return nil, fmt.Errorf("OPENAI_API_CHAT_FORCED_PARAMS is not valid JSON ('%s')", cfg.OpenAIAPIChatForcedParams)
 	}
 	if cfg.RequestTimeout <= 0 {
 		return nil, fmt.Errorf("REQUEST_TIMEOUT must be greater than 0")
